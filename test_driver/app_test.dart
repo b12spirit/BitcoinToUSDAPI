@@ -3,38 +3,87 @@ import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Counter App', () {
-    // First, define the Finders and use them to locate widgets from the
-    // test suite. Note: the Strings provided to the `byValueKey` method must
-    // be the same as the Strings we used for the Keys in step 1.
-    final counterTextFinder = find.byValueKey('counter');
-    final buttonFinder = find.byValueKey('increment');
-
-    FlutterDriver driver;
-
-    // Connect to the Flutter driver before running any tests.
-    setUpAll(() async {
-      driver = await FlutterDriver.connect();
+  FlutterDriver driver;
+  // Connect to the Flutter driver before running any tests.
+  setUpAll(() async {
+    driver = await FlutterDriver.connect();
+  });
+  // Close the connection to the driver after the tests have completed.
+  tearDownAll(() async {
+    if (driver != null) {
+      driver.close();
+    }
+  });
+  final homePage = find.byValueKey('homepage');
+  final usdButton = find.byValueKey('USDtoBTC');
+  final btcButton = find.byValueKey('BTCtoUSD');
+  final usdtobtcResult = find.byValueKey('dollartobtc');
+  final btctodollarResult = find.byValueKey('btctodollar');
+  final usdtextField = find.byValueKey('usdtextfield');
+  final btctextField = find.byValueKey('btctextfield');
+  final backUsd = find.byValueKey('backUSD');
+  final backBtc = find.byValueKey('backBTC');
+  group('Bitcoin Calculator Happy Paths', () {
+    /*
+      Given I am on the USD/BTC Calculator Homepage
+      When I tap "USD to BTC"
+      And I enter "1"
+      Then I should see " BTC 0.000072"
+    */
+    test('Check that convertion from USD to BTC works', () async {
+      await driver.tap(usdButton);
+      await driver.tap(usdtextField);
+      await driver.enterText('1');
+      await Future.delayed(const Duration(seconds: 1));
+      await driver.waitFor(find.text('1'));
+      expect(await driver.getText(usdtobtcResult), " BTC 0.000072");
+      await driver.tap(backUsd);
+      expect(await driver.getText(homePage), "USD/BTC Calculator Homepage");
     });
-
-    // Close the connection to the driver after the tests have completed.
-    tearDownAll(() async {
-      if (driver != null) {
-        driver.close();
-      }
-    });
-
-    test('starts at 0', () async {
+/*
+      Given I am on the USD/BTC Calculator Homepage
+      When I tap "BTC to USD"
+      And I enter "1"
+      Then I should see " USD 13804."
+    */
+    test('Check that convertion from BTC to USD works', () async {
       // Use the `driver.getText` method to verify the counter starts at 0.
-      expect(await driver.getText(counterTextFinder), "0");
+      await driver.tap(btcButton);
+      await driver.tap(btctextField);
+      await driver.enterText('1');
+      await Future.delayed(const Duration(seconds: 1));
+      await driver.waitFor(find.text('1'));
+      expect(await driver.getText(btctodollarResult), " USD 13804.6");
+      await driver.tap(backBtc);
+      expect(await driver.getText(homePage), "USD/BTC Calculator Homepage");
     });
+  });
 
-    test('increments the counter', () async {
-      // First, tap the button.
-      await driver.tap(buttonFinder);
+//We did not use any sad path testing since there is no sad paths to test.
+//our app does not allow negatives and accepts nonzero numbers only.
+  group('Bitcoin Calculator Sad Paths', () {
+    /*
+      Given I am on the USD/BTC Calculator Homepage
+      When I tap "USD to BTC"
+      And I enter "0"
+      Then I should not be able to see as it is transparent.
+    */
+    // test('Check that the USD input doesnt not accept 0', () async {
+    //   await driver.tap(usdButton);
+    //   await driver.tap(usdtextField);
+    //   await driver.enterText('0');
+    //   await Future.delayed(const Duration(seconds: 1));
+    //   await driver.waitFor(find.text('0'));
+    //   expect(await driver.getText(usdtobtcResult), "0");
+    // });
 
-      // Then, verify the counter text is incremented by 1.
-      expect(await driver.getText(counterTextFinder), "1");
-    });
+    // test('Check that the BTC input doesnt not accept 0', () async {
+    //   await driver.tap(btcButton);
+    //   await driver.tap(btctextField);
+    //   await driver.enterText('0');
+    //   await Future.delayed(const Duration(seconds: 1));
+    //   await driver.waitFor(find.text('0'));
+    //   expect(await driver.getText(btctodollarResult), "0");
+    // });
   });
 }

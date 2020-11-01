@@ -1,14 +1,14 @@
+import 'package:bitcoin_calculator/3BTCtoUSD.dart';
 import 'package:flutter/material.dart';
+import '2USDtoBTC.dart';
+import '3BTCtoUSD.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Counter App',
-      home: MyHomePage(title: 'Counter App Home Page'),
-    );
+    return MaterialApp(title: 'BTC/USD Calculator', home: MyHomePage());
   }
 }
 
@@ -22,45 +22,67 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff4D4B4B),
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          "USD/BTC Calculator Homepage",
+          key: Key('homepage'),
+        ),
+        backgroundColor: Colors.black,
+        elevation: 0,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            //Shape of the USD to BTC button
+            SizedBox(
+              height: 45,
+              width: 200,
+              child: RaisedButton(
+                color: Colors.green[200],
+                child: Text(
+                  "USD  to  BTC",
+                  style: TextStyle(color: Colors.black, fontSize: 25),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                //test
+                key: Key("USDtoBTC"),
+                //navigate to BTC page
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => USD()));
+                },
+              ),
             ),
-            Text(
-              '$_counter',
-              // Provide a Key to this specific Text widget. This allows
-              // identifying the widget from inside the test suite,
-              // and reading the text.
-              key: Key('counter'),
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            Padding(padding: EdgeInsets.all(10)),
+            //Shape of the BTC to USD button
+            SizedBox(
+              height: 45,
+              width: 200,
+              child: RaisedButton(
+                color: Colors.red[200],
+                child: Text(
+                  "BTC  to  USD",
+                  style: TextStyle(color: Colors.black, fontSize: 25),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                //test
+                key: Key("BTCtoUSD"),
+                //navigate to BTC page
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => BTC()));
+                },
+              ),
+            )
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        // Provide a Key to this button. This allows finding this
-        // specific button inside the test suite, and tapping it.
-        key: Key('increment'),
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
