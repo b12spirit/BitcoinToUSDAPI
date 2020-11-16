@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:bitcoin_calculator/config/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bitcoin_calculator/utils/calculations.dart';
@@ -10,6 +13,13 @@ class BTC extends StatefulWidget {
 class _BTCState extends State<BTC> {
   double result;
   bool resultcolor = false;
+  Future<double> currency;
+
+  @override
+  void initState() {
+    super.initState();
+    currency = CurrencyAPI.fetchCurrency(httpClient);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +98,24 @@ class _BTCState extends State<BTC> {
                         }),
                   )),
                   Padding(padding: EdgeInsets.all(7)),
+                  FutureBuilder<double>(
+                    future: currency,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        //double price = snapshot.data;
+                        return Text("Current Bitcoin Price: $bitcoinvalue",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                            key: Key("price-text"));
+                      } else if (snapshot.hasError) {
+                        return Text("${snapshot.error}");
+                      }
+
+                      return CircularProgressIndicator();
+                    },
+                  ),
                 ])));
   }
 }

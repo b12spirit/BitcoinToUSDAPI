@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bitcoin_calculator/utils/calculations.dart';
+import 'package:bitcoin_calculator/config/globals.dart';
 
 class USD extends StatefulWidget {
   @override
@@ -10,6 +12,13 @@ class USD extends StatefulWidget {
 class _USDState extends State<USD> {
   double result;
   bool resultcolor = false;
+  Future<double> currency;
+
+  @override
+  void initState() {
+    super.initState();
+    currency = CurrencyAPI.fetchCurrency(httpClient);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +99,25 @@ class _USDState extends State<USD> {
                           });
                         }),
                   )),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  FutureBuilder<double>(
+                    future: currency,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        double price = snapshot.data;
+                        return Text("Current Dollar Price per BTC: $price",
+                            key: Key("price-text"),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15));
+                      } else if (snapshot.hasError) {
+                        return Text("${snapshot.error}");
+                      }
+
+                      return CircularProgressIndicator();
+                    },
+                  ),
                 ])));
   }
 }

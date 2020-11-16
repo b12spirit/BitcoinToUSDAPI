@@ -1,6 +1,9 @@
 // Imports the Flutter Driver API.
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
+import 'package:bitcoin_calculator/config/globals.dart' as globals;
+import 'package:http/http.dart' as http;
+import 'package:mockito/mockito.dart';
 
 void main() {
   FlutterDriver driver;
@@ -23,6 +26,22 @@ void main() {
   final btctextField = find.byValueKey('btctextfield');
   final backUsd = find.byValueKey('backUSD');
   final backBtc = find.byValueKey('backBTC');
+
+  group('Fetch Fake Values', () {
+    test(
+        'Goes to API grabs a updated value but we forced code a static number instead',
+        () async {
+      await driver.tap(usdButton);
+      await driver.tap(usdtextField);
+      await driver.enterText('15990.6483');
+      await Future.delayed(const Duration(seconds: 1));
+      await driver.waitFor(find.text('15990.6483'));
+      expect(await driver.getText(usdtobtcResult), " BTC 1.0");
+      await driver.tap(backUsd);
+      expect(await driver.getText(homePage), "USD/BTC Calculator Homepage");
+    });
+  });
+
   group('Bitcoin Calculator Happy Paths', () {
     /*
       Given I am on the USD/BTC Calculator Homepage
@@ -36,7 +55,8 @@ void main() {
       await driver.enterText('1');
       await Future.delayed(const Duration(seconds: 1));
       await driver.waitFor(find.text('1'));
-      expect(await driver.getText(usdtobtcResult), " BTC 0.000072");
+      expect(
+          await driver.getText(usdtobtcResult), " BTC 0.00006253655144175737");
       await driver.tap(backUsd);
       expect(await driver.getText(homePage), "USD/BTC Calculator Homepage");
     });
@@ -53,7 +73,7 @@ void main() {
       await driver.enterText('1');
       await Future.delayed(const Duration(seconds: 1));
       await driver.waitFor(find.text('1'));
-      expect(await driver.getText(btctodollarResult), " USD 13804.6");
+      expect(await driver.getText(btctodollarResult), " USD 15990.6483");
       await driver.tap(backBtc);
       expect(await driver.getText(homePage), "USD/BTC Calculator Homepage");
     });
